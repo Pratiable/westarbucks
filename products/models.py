@@ -5,6 +5,9 @@ from django.db import models
 class Menu(models.Model):
     name = models.CharField(max_length=45)
 
+    def __str__(self):
+        return self.name
+
     class Meta:
         db_table = 'menu'
 
@@ -12,25 +15,34 @@ class Category(models.Model):
     name = models.CharField(max_length=45)
     menu = models.ForeignKey('Menu', on_delete=models.CASCADE)
 
+    def __str__(self):
+        return self.name
+
     class Meta:
         db_table = 'categories'
-
-class Allergy(models.Model):
-    name = models.CharField(max_length=45)
-
-    class Meta:
-        db_table = 'allergy'
 		
 class Product(models.Model):
     category        = models.ForeignKey('Category', on_delete=models.CASCADE)
     korean_name     = models.CharField(max_length=45)
     english_name    = models.CharField(max_length=45)
     description     = models.TextField(null=True)
-    nutrition       = models.ForeignKey('Nutrition', on_delete=models.CASCADE, null=True)
-    allergys        = models.ManyToManyField(Allergy, through='ProductAllergy')
+    nutrition       = models.ForeignKey('Nutrition', on_delete=models.SET_NULL, null=True)
+    allergies       = models.ManyToManyField('Allergy')
+
+    def __str__(self):
+        return self.korean_name
 
     class Meta:
         db_table = 'products'
+
+class Allergy(models.Model):
+    name = models.CharField(max_length=45)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        db_table = 'allergy'
 
 class Image(models.Model):
     image_url   = models.CharField(max_length=2000)
@@ -51,10 +63,4 @@ class Nutrition(models.Model):
 
     class Meta:
         db_table = 'nutritions'
-
-class ProductAllergy(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    allergy = models.ForeignKey(Allergy, on_delete=models.CASCADE)
-
-    class Meta:
-        db_table = 'allergy_products'
+        
